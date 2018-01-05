@@ -1,13 +1,11 @@
 package com.ken.exception;
 
-import com.ken.config.StringEncodingConfig;
-
 /**
  * Created by liuken on 2017/12/30.
  */
-public class OutOfRangeException extends StringEncodingException {
+public class OutOfRangeException extends StringEncodeException {
 
     public OutOfRangeException(String strValue) {
-        super(strValue, "Too long to encoding in a value type!");
+        super(strValue, "Too long to encode!");
     }
 }

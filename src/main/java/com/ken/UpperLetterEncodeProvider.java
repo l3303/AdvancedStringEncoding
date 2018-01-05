@@ -7,10 +7,11 @@ import org.springframework.stereotype.Component;
  * Transfer Upper letters to value type
  */
 @Component
-class UpperLetterEncoding extends AbstractFundamentalEncoding {
+public class UpperLetterEncodeProvider extends AbstractBasicEncodeProvider {
 
     private static final int LETTER_DIGIT = 5;
 
+    @Override
     protected int getCharacterBits() {
         return LETTER_DIGIT;
     }
@@ -21,8 +22,8 @@ class UpperLetterEncoding extends AbstractFundamentalEncoding {
      * @param letter
      * @return
      */
-    protected int encodingToValueType(char letter)
-    {
+    @Override
+    protected int encodeToInteger(char letter) {
         int origin = (int) letter;
         if (origin > 64 && origin < 91) {
             return origin - 64;
@@ -31,7 +32,8 @@ class UpperLetterEncoding extends AbstractFundamentalEncoding {
         }
     }
 
-    protected char decodingToCharacter(int value) {
+    @Override
+    protected char decodeToCharacter(int value) {
         return (char)(value + 64);
     }
 }

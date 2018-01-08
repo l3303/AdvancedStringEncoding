@@ -37,8 +37,8 @@ public class DefaultValueJoinProvider implements ValueJoinProvider {
                 throw new ValueJoinOutOfRangeException(info.getValueLimitShort(), value);
             }
             int dataIndex = info.getDataIndex();
-            data[dataIndex] += (long) value;
             data[dataIndex] <<= info.getDigit();
+            data[dataIndex] += (long) value;
         }
 
         return new VariableValue(data);
@@ -66,8 +66,8 @@ public class DefaultValueJoinProvider implements ValueJoinProvider {
                 throw new ValueJoinOutOfRangeException(info.getValueLimitInteger(), value);
             }
             int dataIndex = info.getDataIndex();
-            data[dataIndex] += (long) value;
             data[dataIndex] <<= info.getDigit();
+            data[dataIndex] += (long) value;
         }
 
         return new VariableValue(data);
@@ -95,8 +95,8 @@ public class DefaultValueJoinProvider implements ValueJoinProvider {
                 throw new ValueJoinOutOfRangeException(info.getValueLimitLong(), value);
             }
             int dataIndex = info.getDataIndex();
-            data[dataIndex] += value;
             data[dataIndex] <<= info.getDigit();
+            data[dataIndex] += value;
         }
 
         return new VariableValue(data);

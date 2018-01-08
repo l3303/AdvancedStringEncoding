@@ -14,7 +14,11 @@ public class VariableValue {
 
     public VariableValue(long[] data) {
         this.data = data;
-        hashCode = calculateHashCode();
+        if (this.data != null) {
+            hashCode = calculateHashCode();
+        } else {
+            hashCode = super.hashCode();
+        }
     }
 
     private int calculateHashCode() {
@@ -29,5 +33,18 @@ public class VariableValue {
     @Override
     public int hashCode() {
         return hashCode;
+    }
+
+    @Override
+    public String toString() {
+        if (data == null) {
+            return "";
+        }
+
+        StringBuilder sb = new StringBuilder((Long.SIZE - 1) * data.length);
+        for (int i = data.length; i > 0; i--) {
+            sb.append(data[i - 1]);
+        }
+        return sb.toString();
     }
 }

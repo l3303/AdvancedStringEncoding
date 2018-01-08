@@ -1,14 +1,9 @@
 package com.ken;
 
-import com.ken.config.StringEncodingConfig;
 import com.ken.exception.InvalidCharacterException;
 import com.ken.exception.OutOfRangeException;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.Console;
 import java.util.ArrayList;
@@ -18,12 +13,7 @@ import java.util.Stack;
 /**
  * Created by liuken on 2017/12/30.
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = StringEncodingConfig.class)
 public class UpperLetterEncodingTest {
-
-    @Autowired
-    UpperLetterEncodeProvider upperLetterEncoding;
 
     @Test
     public void test_encodingToInterge() {

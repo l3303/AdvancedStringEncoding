@@ -1,12 +1,8 @@
 package com.ken;
 
-import com.ken.exception.StringDecodeException;
-import org.springframework.stereotype.Component;
-
 /**
  * Created by liuken on 2017/12/30.
  */
-@Component
 public class UpperLetterNumberMixEncodeProvider extends AbstractBasicEncodeProvider {
 
     private static final int LETTER_DIGIT = 6;

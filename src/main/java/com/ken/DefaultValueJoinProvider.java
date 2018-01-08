@@ -11,10 +11,10 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class DefaultValueJoinProvider implements ValueJoinProvider {
 
-    /*
+    /**
     * Cache other ValueJoinFormat instances convert to DefaultValueJoinFormat
     * ConcurrentHashMap ensure thread-safe
-    * */
+    */
     private static final ConcurrentHashMap<ValueJoinFormat, DefaultValueJoinFormat> formatMap = new ConcurrentHashMap<ValueJoinFormat, DefaultValueJoinFormat>();
 
     @Override

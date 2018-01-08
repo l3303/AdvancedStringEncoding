@@ -5,10 +5,8 @@ import com.ken.exception.OutOfRangeException;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.Console;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
 
 /**
  * Created by liuken on 2017/12/30.
@@ -17,7 +15,7 @@ public class UpperLetterEncodingTest {
 
     @Test
     public void test_encodingToInterge() {
-        EncodeProvider provider = new UpperLetterNumberMixEncodeProvider();
+        EncodeProvider provider = new DefaultEncodeProvider();
         try {
             int a = provider.encodeToInteger("AC");
             System.out.println(Integer.toBinaryString(a));
@@ -54,7 +52,7 @@ public class UpperLetterEncodingTest {
 
     @Test
     public void test_mix() {
-        EncodeProvider provider = new UpperLetterNumberMixEncodeProvider();
+        EncodeProvider provider = new DefaultEncodeProvider();
 
         try {
             int a = provider.encodeToInteger("A8AS9");

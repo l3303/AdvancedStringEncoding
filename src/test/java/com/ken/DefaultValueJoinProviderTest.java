@@ -12,7 +12,7 @@ public class DefaultValueJoinProviderTest {
 
         DefaultValueJoinProvider provider = new DefaultValueJoinProvider();
 
-        UpperLetterNumberMixEncodeProvider encodeProvider = new UpperLetterNumberMixEncodeProvider();
+        DefaultEncodeProvider encodeProvider = new DefaultEncodeProvider();
         try {
 
             Object result = provider.join(format, encodeProvider.encodeToInteger("SHA"), encodeProvider.encodeToInteger("NYC"), 2018, 4, 25, encodeProvider.encodeToInteger("NYC"), encodeProvider.encodeToInteger("SHA"), 2018, 4, 28);

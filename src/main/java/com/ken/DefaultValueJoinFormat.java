@@ -69,11 +69,11 @@ public class DefaultValueJoinFormat implements ValueJoinFormat {
         Integer target = originList[curIndex];
         index--;
 
-        List<BuckInfo> usedStackNew = new ArrayList<BuckInfo>(usedBucks);
+        List<BuckInfo> usedBucksNew = new ArrayList<BuckInfo>(usedBucks);
         BuckInfo newBuck = new BuckInfo();
         newBuck.append(target, curIndex);
-        usedStackNew.add(newBuck);
-        List<BuckInfo> minUsedStack = calculateOptimal(originList, index, usedStackNew);;
+        usedBucksNew.add(newBuck);
+        List<BuckInfo> minUsedBucks = calculateOptimal(originList, index, usedBucksNew);;
         for (int i = 0; i < usedBucks.size(); i++) {
             BuckInfo existBuck = usedBucks.get(i);
             if (!existBuck.canAppend(target)) {
@@ -84,11 +84,11 @@ public class DefaultValueJoinFormat implements ValueJoinFormat {
             newBuck.append(target, curIndex);
             tmpBucks.set(i, newBuck);
             List<BuckInfo> tmpResult = calculateOptimal(originList, index, tmpBucks);
-            if (tmpResult.size() < minUsedStack.size()) {
-                minUsedStack = tmpResult;
+            if (tmpResult.size() < minUsedBucks.size()) {
+                minUsedBucks = tmpResult;
             }
         }
-        return minUsedStack;
+        return minUsedBucks;
     }
 
     public class ElementInfo {
@@ -259,7 +259,7 @@ public class DefaultValueJoinFormat implements ValueJoinFormat {
                 case 63:
                     return ConstValue.SHORT_DIGIT_15;
                 default:
-                    throw new IllegalArgumentException(String.format("%d is not valid digit!", digit));
+                    throw new IllegalArgumentException(String.format("%d digits exceed limit!", digit));
             }
         }
 
@@ -392,7 +392,7 @@ public class DefaultValueJoinFormat implements ValueJoinFormat {
                 case 63:
                     return ConstValue.INTEGER_DIGIT_31;
                 default:
-                    throw new IllegalArgumentException(String.format("%d is not valid digit!", digit));
+                    throw new IllegalArgumentException(String.format("%d digits exceed limit!", digit));
             }
         }
 
@@ -525,7 +525,7 @@ public class DefaultValueJoinFormat implements ValueJoinFormat {
                 case 63:
                     return ConstValue.LONG_DIGIT_63;
                 default:
-                    throw new IllegalArgumentException(String.format("%d is not valid digit!", digit));
+                    throw new IllegalArgumentException(String.format("%d digits exceed limit!", digit));
             }
         }
     }
@@ -646,7 +646,7 @@ public class DefaultValueJoinFormat implements ValueJoinFormat {
     }
 
     private class BuckInfo {
-        private static final int MAX_VOLUME = 63;
+        private static final int MAX_VOLUME = Long.SIZE - 1;
 
         private int volume;
 

@@ -4,6 +4,7 @@ package com.ken;
  * Created by liuken on 2017/12/30.
  * Transfer Upper letters to value type
  */
+@Deprecated
 public class UpperLetterEncodeProvider extends AbstractBasicEncodeProvider {
 
     private static final int LETTER_DIGIT = 5;

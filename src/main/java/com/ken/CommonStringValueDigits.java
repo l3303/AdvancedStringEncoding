@@ -29,9 +29,9 @@ public class CommonStringValueDigits {
     public static int SEATGRADE = 4;
 
     /**
-     * FareBasis 5 characters string
+     * FareBasis 8 characters string
      */
-    public static int FAREBASIS = 30;
+    public static int FAREBASIS = 48;
 
     public static int ENGINETYPE = 31;
 

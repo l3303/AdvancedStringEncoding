@@ -9,7 +9,7 @@ public class DefaultEncodeProvider extends AbstractBasicEncodeProvider {
     private static final int ENCODE_TABLE_COUNT = 127;
     private static final int DECODE_TABLE_COUNT = 37;
 
-    public static final int[] encode_table = new int[ENCODE_TABLE_COUNT];
+    public static final short[] encode_table = new short[ENCODE_TABLE_COUNT];
 
     public static final char[] decode_table = new char[] {
             '\0',
@@ -25,7 +25,7 @@ public class DefaultEncodeProvider extends AbstractBasicEncodeProvider {
             encode_table[i] = -1;
         }
         for (int i = 1; i < decode_table.length; ++i) {
-            encode_table[decode_table[i]] = i;
+            encode_table[decode_table[i]] = (short) i;
         }
     }
 
@@ -35,7 +35,7 @@ public class DefaultEncodeProvider extends AbstractBasicEncodeProvider {
     }
 
     @Override
-    protected int encodeToInteger(char letter) {
+    protected short encodeToInteger(char letter) {
         int value = letter;
         if (value > 0 && value < ENCODE_TABLE_COUNT) {
             return encode_table[value];

@@ -248,7 +248,7 @@ public abstract class AbstractBasicEncodeProvider implements EncodeProvider {
      * @param letter
      * @return negative value means encode fail
      */
-    protected abstract int encodeToInteger(char letter);
+    protected abstract short encodeToInteger(char letter);
 
     protected abstract char decodeToCharacter(int value);
 }

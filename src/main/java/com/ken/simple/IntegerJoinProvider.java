@@ -3,6 +3,7 @@ package com.ken.simple;
 import com.ken.ValueJoinFormat;
 import com.ken.exception.ValueCountNotMatchException;
 import com.ken.exception.ValueJoinException;
+import com.ken.exception.ValueJoinOutOfRangeException;
 
 public class IntegerJoinProvider {
 
@@ -22,17 +23,38 @@ public class IntegerJoinProvider {
     public static int join (ValueJoinFormat format, int... valueList) throws ValueJoinException {
         int elementCount = valueList.length;
         if (format.getElementCount() != elementCount) {
-            throw new ValueCountNotMatchException(elementCount, valueList.length);
+            throw new ValueCountNotMatchException(format.getElementCount(), valueList.length);
         }
 
         int[] encodeDigitList = format.encodeDigitList();
         int result = 0;
         for (int i = 0; i < elementCount; i++) {
-            int value = valueList[i];
-            int digits = encodeDigitList[i];
-            result <<= digits;
-            result += value;
+            result = join(result, encodeDigitList[i], valueList[i]);
         }
         return result;
+    }
+
+    private static int join(int origin, int digits, int value) {
+        origin <<= digits;
+        origin += value;
+        return origin;
+    }
+
+    public class IntegerJoinBuilder {
+        private int result = 0;
+        private int usedDigits = 0;
+
+        public int append(int digits, int value) throws ValueJoinException {
+            usedDigits += digits;
+            if (usedDigits > DIGITS_LIMIT) {
+                throw new ValueJoinOutOfRangeException(DIGITS_LIMIT, usedDigits);
+            }
+            int limit = 1 << digits - 1;
+            if (value > limit) {
+                throw new ValueJoinOutOfRangeException(limit, value);
+            }
+            result = join(result, digits, value);
+            return result;
+        }
     }
 }

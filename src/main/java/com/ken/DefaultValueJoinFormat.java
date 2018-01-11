@@ -8,6 +8,8 @@ import java.util.List;
  */
 public class DefaultValueJoinFormat implements ValueJoinFormat {
 
+    private static final int MAX_VOLUME = Long.SIZE - 1;
+
     private final int elementCount;
     private final int[] digitList;
 
@@ -46,76 +48,73 @@ public class DefaultValueJoinFormat implements ValueJoinFormat {
 
     private void initial() {
         elementInfos = new DefaultValueJoinFormat.ElementInfo[elementCount];
+        int startIndex = 0;
+        int curVolume = MAX_VOLUME;
         for (int i = 0; i < elementCount; i++) {
-            elementInfos[i] = new DefaultValueJoinFormat.ElementInfo(digitList[i]);
-        }
+            int digits = digitList[i];
+            elementInfos[i] = new DefaultValueJoinFormat.ElementInfo(digits);
+            elementInfos[i].setStartIndex(startIndex);
+            int loadedDigits = curVolume < digits ? curVolume : digits;
+            elementInfos[i].setCurDigits(loadedDigits);
+            curVolume -= loadedDigits;
+            digits -= loadedDigits;
 
-        List<BuckInfo> optimalBucks = calculateOptimal(digitList, digitList.length - 1, new ArrayList<BuckInfo>());
-        dataLength = optimalBucks.size();
-        for (int i = 0; i < optimalBucks.size(); i++) {
-            BuckInfo buck = optimalBucks.get(i);
-            for (Integer index : buck.getIndexCache()) {
-                elementInfos[index].setDataIndex(i);
+            if (curVolume == 0) {
+                startIndex++;
+                curVolume = MAX_VOLUME;
+            }
+
+            if (digits != 0) {
+                elementInfos[i].setNextDigits(digits);
+                curVolume -= digits;
             }
         }
-    }
-
-    private List<BuckInfo> calculateOptimal(int[] originList, int index, List<BuckInfo> usedBucks) {
-        if (index < 0) {
-            return usedBucks;
-        }
-
-        Integer curIndex = index;
-        Integer target = originList[curIndex];
-        index--;
-
-        List<BuckInfo> usedBucksNew = new ArrayList<BuckInfo>(usedBucks);
-        BuckInfo newBuck = new BuckInfo();
-        newBuck.append(target, curIndex);
-        usedBucksNew.add(newBuck);
-        List<BuckInfo> minUsedBucks = calculateOptimal(originList, index, usedBucksNew);;
-        for (int i = 0; i < usedBucks.size(); i++) {
-            BuckInfo existBuck = usedBucks.get(i);
-            if (!existBuck.canAppend(target)) {
-                continue;
-            }
-            List<BuckInfo> tmpBucks = new ArrayList<BuckInfo>(usedBucks);
-            newBuck = new BuckInfo(existBuck);
-            newBuck.append(target, curIndex);
-            tmpBucks.set(i, newBuck);
-            List<BuckInfo> tmpResult = calculateOptimal(originList, index, tmpBucks);
-            if (tmpResult.size() < minUsedBucks.size()) {
-                minUsedBucks = tmpResult;
-            }
-        }
-        return minUsedBucks;
+        dataLength = startIndex + 1;
     }
 
     public class ElementInfo {
-        private final int digit;
+        private final int originDigits;
         private final short valueLimitShort;
         private final int valueLimitInteger;
         private final long valueLimitLong;
 
-        private int dataIndex;
+        private int startIndex;
+        private int curDigits;
+        private int nextDigits;
 
-        public ElementInfo(int digit) {
-            this.digit = digit;
-            valueLimitShort = getShortLimit(digit);
-            valueLimitInteger = getIntegerLimit(digit);
-            valueLimitLong = getLongLimit(digit);
+        public ElementInfo(int digits) {
+            this.originDigits = digits;
+            valueLimitShort = getShortLimit(digits);
+            valueLimitInteger = getIntegerLimit(digits);
+            valueLimitLong = getLongLimit(digits);
         }
 
-        public int getDataIndex() {
-            return dataIndex;
+        public int getStartIndex() {
+            return startIndex;
         }
 
-        public void setDataIndex(int dataIndex) {
-            this.dataIndex = dataIndex;
+        public void setStartIndex(int startIndex) {
+            this.startIndex = startIndex;
         }
 
-        public int getDigit() {
-            return digit;
+        public int getCurDigits() {
+            return curDigits;
+        }
+
+        public void setCurDigits(int curDigits) {
+            this.curDigits = curDigits;
+        }
+
+        public int getNextDigits() {
+            return nextDigits;
+        }
+
+        public void setNextDigits(int nextDigits) {
+            this.nextDigits = nextDigits;
+        }
+
+        public int getOriginDigits() {
+            return originDigits;
         }
 
         public short getValueLimitShort() {
@@ -130,8 +129,8 @@ public class DefaultValueJoinFormat implements ValueJoinFormat {
             return valueLimitLong;
         }
 
-        private short getShortLimit(int digit) {
-            switch (digit) {
+        private short getShortLimit(int digits) {
+            switch (digits) {
                 case 1:
                     return ConstValue.SHORT_DIGIT_1;
                 case 2:
@@ -259,12 +258,12 @@ public class DefaultValueJoinFormat implements ValueJoinFormat {
                 case 63:
                     return ConstValue.SHORT_DIGIT_15;
                 default:
-                    throw new IllegalArgumentException(String.format("%d digits exceed limit!", digit));
+                    throw new IllegalArgumentException(String.format("%d digits exceed limit!", digits));
             }
         }
 
-        private int getIntegerLimit(int digit) {
-            switch (digit) {
+        private int getIntegerLimit(int digits) {
+            switch (digits) {
                 case 1:
                     return ConstValue.INTEGER_DIGIT_1;
                 case 2:
@@ -392,12 +391,12 @@ public class DefaultValueJoinFormat implements ValueJoinFormat {
                 case 63:
                     return ConstValue.INTEGER_DIGIT_31;
                 default:
-                    throw new IllegalArgumentException(String.format("%d digits exceed limit!", digit));
+                    throw new IllegalArgumentException(String.format("%d digits exceed limit!", digits));
             }
         }
 
-        private long getLongLimit(int digit) {
-            switch (digit) {
+        private long getLongLimit(int digits) {
+            switch (digits) {
                 case 1:
                     return ConstValue.LONG_DIGIT_1;
                 case 2:
@@ -525,158 +524,8 @@ public class DefaultValueJoinFormat implements ValueJoinFormat {
                 case 63:
                     return ConstValue.LONG_DIGIT_63;
                 default:
-                    throw new IllegalArgumentException(String.format("%d digits exceed limit!", digit));
+                    throw new IllegalArgumentException(String.format("%d digits exceed limit!", digits));
             }
-        }
-    }
-
-    private class ConstValue {
-        public final static short SHORT_DIGIT_1 = 1;
-        public final static short SHORT_DIGIT_2 = 3;
-        public final static short SHORT_DIGIT_3 = 7;
-        public final static short SHORT_DIGIT_4 = 15;
-        public final static short SHORT_DIGIT_5 = 31;
-        public final static short SHORT_DIGIT_6 = 63;
-        public final static short SHORT_DIGIT_7 = 127;
-        public final static short SHORT_DIGIT_8 = 255;
-        public final static short SHORT_DIGIT_9 = 511;
-        public final static short SHORT_DIGIT_10 = 1023;
-        public final static short SHORT_DIGIT_11 = 2047;
-        public final static short SHORT_DIGIT_12 = 4095;
-        public final static short SHORT_DIGIT_13 = 8191;
-        public final static short SHORT_DIGIT_14 = 16383;
-        public final static short SHORT_DIGIT_15 = 32767;
-
-        public final static int INTEGER_DIGIT_1 = 1;
-        public final static int INTEGER_DIGIT_2 = 3;
-        public final static int INTEGER_DIGIT_3 = 7;
-        public final static int INTEGER_DIGIT_4 = 15;
-        public final static int INTEGER_DIGIT_5 = 31;
-        public final static int INTEGER_DIGIT_6 = 63;
-        public final static int INTEGER_DIGIT_7 = 127;
-        public final static int INTEGER_DIGIT_8 = 255;
-        public final static int INTEGER_DIGIT_9 = 511;
-        public final static int INTEGER_DIGIT_10 = 1023;
-        public final static int INTEGER_DIGIT_11 = 2047;
-        public final static int INTEGER_DIGIT_12 = 4095;
-        public final static int INTEGER_DIGIT_13 = 8191;
-        public final static int INTEGER_DIGIT_14 = 16383;
-        public final static int INTEGER_DIGIT_15 = 32767;
-        public final static int INTEGER_DIGIT_16 = 65535;
-        public final static int INTEGER_DIGIT_17 = 131071;
-        public final static int INTEGER_DIGIT_18 = 262143;
-        public final static int INTEGER_DIGIT_19 = 524287;
-        public final static int INTEGER_DIGIT_20 = 1048575;
-        public final static int INTEGER_DIGIT_21 = 2097151;
-        public final static int INTEGER_DIGIT_22 = 4194303;
-        public final static int INTEGER_DIGIT_23 = 8388607;
-        public final static int INTEGER_DIGIT_24 = 16777215;
-        public final static int INTEGER_DIGIT_25 = 33554431;
-        public final static int INTEGER_DIGIT_26 = 67108863;
-        public final static int INTEGER_DIGIT_27 = 134217727;
-        public final static int INTEGER_DIGIT_28 = 268435455;
-        public final static int INTEGER_DIGIT_29 = 536870911;
-        public final static int INTEGER_DIGIT_30 = 1073741823;
-        public final static int INTEGER_DIGIT_31 = 2147483647;
-
-        public final static long LONG_DIGIT_1 = 1L;
-        public final static long LONG_DIGIT_2 = 3L;
-        public final static long LONG_DIGIT_3 = 7L;
-        public final static long LONG_DIGIT_4 = 15L;
-        public final static long LONG_DIGIT_5 = 31L;
-        public final static long LONG_DIGIT_6 = 63L;
-        public final static long LONG_DIGIT_7 = 127L;
-        public final static long LONG_DIGIT_8 = 255L;
-        public final static long LONG_DIGIT_9 = 511L;
-        public final static long LONG_DIGIT_10 = 1023L;
-        public final static long LONG_DIGIT_11 = 2047L;
-        public final static long LONG_DIGIT_12 = 4095L;
-        public final static long LONG_DIGIT_13 = 8191L;
-        public final static long LONG_DIGIT_14 = 16383L;
-        public final static long LONG_DIGIT_15 = 32767L;
-        public final static long LONG_DIGIT_16 = 65535L;
-        public final static long LONG_DIGIT_17 = 131071L;
-        public final static long LONG_DIGIT_18 = 262143L;
-        public final static long LONG_DIGIT_19 = 524287L;
-        public final static long LONG_DIGIT_20 = 1048575L;
-        public final static long LONG_DIGIT_21 = 2097151L;
-        public final static long LONG_DIGIT_22 = 4194303L;
-        public final static long LONG_DIGIT_23 = 8388607L;
-        public final static long LONG_DIGIT_24 = 16777215L;
-        public final static long LONG_DIGIT_25 = 33554431L;
-        public final static long LONG_DIGIT_26 = 67108863L;
-        public final static long LONG_DIGIT_27 = 134217727L;
-        public final static long LONG_DIGIT_28 = 268435455L;
-        public final static long LONG_DIGIT_29 = 536870911L;
-        public final static long LONG_DIGIT_30 = 1073741823L;
-        public final static long LONG_DIGIT_31 = 2147483647L;
-        public final static long LONG_DIGIT_32 = 2147483647L;
-        public final static long LONG_DIGIT_33 = 4294967295L;
-        public final static long LONG_DIGIT_34 = 8589934591L;
-        public final static long LONG_DIGIT_35 = 17179869183L;
-        public final static long LONG_DIGIT_36 = 34359738367L;
-        public final static long LONG_DIGIT_37 = 68719476735L;
-        public final static long LONG_DIGIT_38 = 137438953471L;
-        public final static long LONG_DIGIT_39 = 274877906943L;
-        public final static long LONG_DIGIT_40 = 549755813887L;
-        public final static long LONG_DIGIT_41 = 1099511627775L;
-        public final static long LONG_DIGIT_42 = 2199023255551L;
-        public final static long LONG_DIGIT_43 = 4398046511103L;
-        public final static long LONG_DIGIT_44 = 8796093022207L;
-        public final static long LONG_DIGIT_45 = 17592186044415L;
-        public final static long LONG_DIGIT_46 = 35184372088831L;
-        public final static long LONG_DIGIT_47 = 70368744177663L;
-        public final static long LONG_DIGIT_48 = 140737488355327L;
-        public final static long LONG_DIGIT_49 = 281474976710655L;
-        public final static long LONG_DIGIT_50 = 562949953421311L;
-        public final static long LONG_DIGIT_51 = 1125899906842623L;
-        public final static long LONG_DIGIT_52 = 2251799813685247L;
-        public final static long LONG_DIGIT_53 = 4503599627370495L;
-        public final static long LONG_DIGIT_54 = 9007199254740991L;
-        public final static long LONG_DIGIT_55 = 18014398509481983L;
-        public final static long LONG_DIGIT_56 = 36028797018963967L;
-        public final static long LONG_DIGIT_57 = 72057594037927935L;
-        public final static long LONG_DIGIT_58 = 144115188075855871L;
-        public final static long LONG_DIGIT_59 = 288230376151711743L;
-        public final static long LONG_DIGIT_60 = 576460752303423487L;
-        public final static long LONG_DIGIT_61 = 1152921504606846975L;
-        public final static long LONG_DIGIT_62 = 2305843009213693951L;
-        public final static long LONG_DIGIT_63 = 4611686018427387903L;
-        public final static long LONG_DIGIT_64 = 9223372036854775807L;
-    }
-
-    private class BuckInfo {
-        private static final int MAX_VOLUME = Long.SIZE - 1;
-
-        private int volume;
-
-        private List<Integer> indexCache;
-
-        public BuckInfo(BuckInfo info) {
-            volume = info.getVolume();
-            indexCache = new ArrayList<Integer>(info.getIndexCache());
-        }
-
-        public BuckInfo() {
-            volume = MAX_VOLUME;
-            indexCache = new ArrayList<Integer>(10);
-        }
-
-        public int getVolume() {
-            return volume;
-        }
-
-        public List<Integer> getIndexCache() {
-            return indexCache;
-        }
-
-        public void append(int content, Integer index) {
-            indexCache.add(index);
-            volume -= content;
-        }
-
-        public boolean canAppend(int content) {
-            return volume >= content;
         }
     }
 }

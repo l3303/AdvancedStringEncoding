@@ -17,7 +17,7 @@ public class VariableValueTest {
         HashMap<VariableValue, Integer> map = new HashMap<VariableValue, Integer>();
         map.put(test, 3);
 
-        Assert.assertEquals("842619284348272719212", test.toString());
+        Assert.assertEquals("5116abf56c32395994", test.toString());
         Assert.assertEquals(3, map.get(test).intValue());
 
         test = new VariableValue(null);

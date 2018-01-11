@@ -10,7 +10,7 @@ public class DefaultValueJoinFormatTest {
 
         for (int i = 0; i < 9; i++) {
             DefaultValueJoinFormat.ElementInfo info = format.getElementInfo(i);
-            System.out.println(String.format("%d %d", info.getDigit(), info.getDataIndex()));
+            System.out.println(String.format("%d %d", info.getOriginDigits(), info.getStartIndex()));
         }
     }
 }

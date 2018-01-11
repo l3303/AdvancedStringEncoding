@@ -75,8 +75,8 @@ public final class VariableValue {
         }
 
         StringBuilder sb = new StringBuilder((Long.SIZE - 1) * data.length);
-        for (int i = data.length; i > 0; i--) {
-            sb.append(data[i - 1]);
+        for (long value : data) {
+            sb.append(Long.toHexString(value));
         }
         return sb.toString();
     }

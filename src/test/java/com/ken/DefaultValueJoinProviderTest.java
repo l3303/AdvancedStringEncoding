@@ -37,4 +37,67 @@ public class DefaultValueJoinProviderTest {
             Assert.assertTrue(e instanceof ValueJoinOutOfRangeException);
         }
     }
+
+    @Test
+    public void test_routeSearchToken() {
+        DefaultValueJoinFormat format = new DefaultValueJoinFormat(
+                CommonStringValueDigits.ENGINETYPE,
+                CommonStringValueDigits.AIRLINE,
+                CommonStringValueDigits.FLIGHTNO,
+                CommonStringValueDigits.AIRLINE,
+                CommonStringValueDigits.FLIGHTNO,
+                CommonStringValueDigits.AIRLINE,
+                CommonStringValueDigits.FLIGHTNO,
+                CommonStringValueDigits.AIRLINE,
+                CommonStringValueDigits.FLIGHTNO,
+                CommonStringValueDigits.SEATGRADE,
+                6,
+                CommonStringValueDigits.SEATGRADE,
+                6,
+                CommonStringValueDigits.SEATGRADE,
+                6,
+                CommonStringValueDigits.SEATGRADE,
+                6,
+                16,
+                12,
+                CommonStringValueDigits.AGENCY_ID,
+                CommonStringValueDigits.AIRLINE,
+                CommonStringValueDigits.ELIGIBILITY_CODE
+        );
+
+        DefaultValueJoinProvider provider = new DefaultValueJoinProvider();
+
+        DefaultEncodeProvider encodeProvider = new DefaultEncodeProvider();
+        try {
+
+            Object result = provider.join(format,
+                    16,
+                    encodeProvider.encodeToInteger("MU"),
+                    501,
+                    encodeProvider.encodeToInteger("FM"),
+                    502,
+                    encodeProvider.encodeToInteger("CX"),
+                    503,
+                    encodeProvider.encodeToInteger("KE"),
+                    504,
+                    1,
+                    encodeProvider.encodeToInteger("Z"),
+                    1,
+                    encodeProvider.encodeToInteger("Z"),
+                    1,
+                    encodeProvider.encodeToInteger("Z"),
+                    1,
+                    encodeProvider.encodeToInteger("Z"),
+                    1032,
+                    301,
+                    137,
+                    encodeProvider.encodeToInteger("MU"),
+                    encodeProvider.encodeToInteger("NOR")
+                    );
+
+            System.out.println(result);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

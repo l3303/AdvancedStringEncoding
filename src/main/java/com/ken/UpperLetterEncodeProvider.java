@@ -21,10 +21,10 @@ public class UpperLetterEncodeProvider extends AbstractBasicEncodeProvider {
      * @return
      */
     @Override
-    protected int encodeToInteger(char letter) {
+    protected short encodeToInteger(char letter) {
         int origin = (int) letter;
         if (origin > 64 && origin < 91) {
-            return origin - 64;
+            return (short) (origin - 64);
         } else {
             return -1;
         }

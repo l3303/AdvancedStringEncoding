@@ -1,5 +1,7 @@
 package com.ken;
 
+import com.ken.utils.LongExtensions;
+
 /**
  * Created by liuken on 2018/1/7.
  * TODO: Serialization not supported!
@@ -29,6 +31,21 @@ public final class VariableValue {
             result = (((result << 5) + result) ^ tmp);
         }
         return result;
+    }
+
+    public static String batchToHexString(VariableValue... values) {
+        int count = 0;
+        for (VariableValue value : values) {
+            count += value.data.length;
+        }
+        char[] buf = new char[count * LongExtensions.HEX_STRING_LENGTH];
+        int offset = 0;
+        for (VariableValue value : values) {
+            for (long val : value.data) {
+                offset = LongExtensions.fillInHexCharacters(buf, val, offset);
+            }
+        }
+        return new String(buf);
     }
 
     @Override
@@ -74,10 +91,11 @@ public final class VariableValue {
             return "";
         }
 
-        StringBuilder sb = new StringBuilder((Long.SIZE - 1) * data.length);
-        for (long value : data) {
-            sb.append(Long.toHexString(value));
+        char[] buf = new char[LongExtensions.HEX_STRING_LENGTH];
+        int offset = 0;
+        for (long val : data) {
+            offset = LongExtensions.fillInHexCharacters(buf, val, offset);
         }
-        return sb.toString();
+        return new String(buf);
     }
 }

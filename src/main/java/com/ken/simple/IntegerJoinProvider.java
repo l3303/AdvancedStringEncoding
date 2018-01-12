@@ -34,13 +34,24 @@ public class IntegerJoinProvider {
         return result;
     }
 
+    public static int[] split(ValueJoinFormat format, int value) {
+        int[] digitList = format.encodeDigitList();
+        int[] list = new int[digitList.length];
+        for (int i = digitList.length; i > 0; i--) {
+            int digits = digitList[i - 1];
+            list[i - 1] = value & ((1 << digits) - 1);
+            value >>= digits;
+        }
+        return list;
+    }
+
     private static int join(int origin, int digits, int value) {
         origin <<= digits;
         origin += value;
         return origin;
     }
 
-    public class IntegerJoinBuilder {
+    public class Builder {
         private int result = 0;
         private int usedDigits = 0;
 

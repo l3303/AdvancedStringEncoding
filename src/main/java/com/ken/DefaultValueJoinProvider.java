@@ -3,6 +3,7 @@ package com.ken;
 import com.ken.exception.ValueCountNotMatchException;
 import com.ken.exception.ValueJoinException;
 import com.ken.exception.ValueJoinOutOfRangeException;
+import com.ken.exception.ValueSplitException;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -78,39 +79,38 @@ public class DefaultValueJoinProvider implements ValueJoinProvider {
     }
 
     @Override
-    public long[] split(ValueJoinFormat format, Object obj) throws ValueJoinException {
+    public long[] split(ValueJoinFormat format, Object obj) throws ValueSplitException {
         if (!(obj instanceof VariableValue)) {
             //TODO: 异常处理
             return null;
         }
-        DefaultValueJoinFormat internalFormat = getInternalFormat(format);
-
         VariableValue value = (VariableValue) obj;
-        long[] datas = value.getData();
-        if (datas.length != internalFormat.getDataLength()) {
+        DefaultValueJoinFormat internalFormat = getInternalFormat(format);
+        long[] data = value.getData();
+        if (data.length != internalFormat.getDataLength()) {
             return null;
         }
 
         int elementCount = internalFormat.getElementCount();
         long[] results = new long[elementCount];
         for (int i = 0; i < elementCount; i++) {
-            results[i] = extractValue(datas, internalFormat.getElementInfo(i));
+            results[i] = extractValue(data, internalFormat.getElementInfo(i));
         }
         return results;
     }
 
     private void insertValue(long[] data, DefaultValueJoinFormat.ElementInfo info, long value) {
         int index = info.getStartIndex();
-        int nextDigits = info.getNextDigits();
         int curDigits = info.getCurDigits();
-        data[index] <<= curDigits;
+        int offset = info.getOffset();
+        int nextDigits = info.getNextDigits();
+        int nextOffset = info.getNextOffset();
         if (nextDigits == 0) {
-            data[index] += value;
+            data[index] += (value << offset);
         } else {
-            data[index] += value & getMask(curDigits);
+            data[index] += ((value & getMask(curDigits)) << offset);
             index++;
-            data[index] <<= nextDigits;
-            data[index] += value >> curDigits;
+            data[index] += ((value >> curDigits) << nextOffset);
         }
     }
 
@@ -119,14 +119,13 @@ public class DefaultValueJoinProvider implements ValueJoinProvider {
         int nextDigits = info.getNextDigits();
         int curDigits = info.getCurDigits();
         int offset = info.getOffset();
+        int nextOffset = info.getNextOffset();
         if (nextDigits == 0) {
             return (data[index] >>> offset) & getMask(curDigits);
         } else {
-            long a = (data[index] >>> offset);
-            long b = a & getMask(curDigits);
-            long val = ((data[index] >>> offset) & getMask(curDigits)) << nextDigits;
-            val += data[index++] & getMask(nextDigits);
-            return ((data[index] >>> offset) & getMask(curDigits)) + ((data[index++] & getMask(nextDigits)) << curDigits);
+            //lower digits + higher digits
+            return ((data[index] >> offset) & getMask(curDigits)) +
+                    (((data[++index] >> nextOffset) & getMask(nextDigits)) << curDigits);
         }
     }
 

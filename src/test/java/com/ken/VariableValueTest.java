@@ -53,6 +53,8 @@ public class VariableValueTest {
         String a = VariableValue.batchToHexString(v1, v2);
         VariableValue[] vlist = VariableValue.batchParse(a);
 
+        System.out.println(a);
+
         Assert.assertEquals(2, vlist.length);
     }
 }

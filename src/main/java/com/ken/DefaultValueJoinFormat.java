@@ -52,30 +52,34 @@ public class DefaultValueJoinFormat implements ValueJoinFormat {
 
     private void initial() {
         elementInfos = new DefaultValueJoinFormat.ElementInfo[elementCount];
-        int startIndex = 0;
+        int dataIndex = 0;
         int curVolume = MAX_VOLUME;
+        int offset = 0;
         for (int i = 0; i < elementCount; i++) {
             int digits = digitList[i];
             elementInfos[i] = new DefaultValueJoinFormat.ElementInfo(digits);
-            elementInfos[i].setStartIndex(startIndex);
+            elementInfos[i].setStartIndex(dataIndex);
+            elementInfos[i].setOffset(offset);
             int loadedDigits = curVolume < digits ? curVolume : digits;
             elementInfos[i].setCurDigits(loadedDigits);
             curVolume -= loadedDigits;
             digits -= loadedDigits;
-
-            elementInfos[i].setOffset(curVolume);
+            offset += loadedDigits;
 
             if (curVolume == 0) {
-                startIndex++;
+                dataIndex++;
                 curVolume = MAX_VOLUME;
+                offset = 0;
             }
 
             if (digits != 0) {
+                elementInfos[i].setNextOffset(offset);
                 elementInfos[i].setNextDigits(digits);
                 curVolume -= digits;
+                offset += digits;
             }
         }
-        dataLength = startIndex + 1;
+        dataLength = dataIndex + 1;
     }
 
     public class ElementInfo {
@@ -87,6 +91,7 @@ public class DefaultValueJoinFormat implements ValueJoinFormat {
         private int startIndex;
         private int offset;
         private int curDigits;
+        private int nextOffset;
         private int nextDigits;
 
         public ElementInfo(int digits) {
@@ -118,6 +123,14 @@ public class DefaultValueJoinFormat implements ValueJoinFormat {
 
         public void setCurDigits(int curDigits) {
             this.curDigits = curDigits;
+        }
+
+        public int getNextOffset() {
+            return nextOffset;
+        }
+
+        public void setNextOffset(int nextOffset) {
+            this.nextOffset = nextOffset;
         }
 
         public int getNextDigits() {

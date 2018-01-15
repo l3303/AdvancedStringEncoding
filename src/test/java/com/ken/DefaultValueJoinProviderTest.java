@@ -98,7 +98,7 @@ public class DefaultValueJoinProviderTest {
             long[] origins = provider.split(format, result);
 
             for (int i = 0; i < origins.length; i++) {
-                Assert.assertEquals(origins[i], (long) array[i]);
+                Assert.assertEquals((long) array[i], origins[i]);
             }
 
             System.out.println(result);

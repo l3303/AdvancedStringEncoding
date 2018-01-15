@@ -12,4 +12,6 @@ public interface ValueJoinProvider {
     Object join(ValueJoinFormat format, int... valueList) throws ValueJoinException;
 
     Object join(ValueJoinFormat format, long... valueList) throws ValueJoinException;
+
+    long[] split(ValueJoinFormat format, Object obj) throws ValueJoinException;
 }

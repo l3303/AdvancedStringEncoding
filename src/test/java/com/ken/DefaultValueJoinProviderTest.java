@@ -70,7 +70,7 @@ public class DefaultValueJoinProviderTest {
         DefaultEncodeProvider encodeProvider = new DefaultEncodeProvider();
         try {
 
-            Object result = provider.join(format,
+            int[] array = new int[]{
                     16,
                     encodeProvider.encodeToInteger("MU"),
                     501,
@@ -92,8 +92,14 @@ public class DefaultValueJoinProviderTest {
                     301,
                     137,
                     encodeProvider.encodeToInteger("MU"),
-                    encodeProvider.encodeToInteger("NOR")
-                    );
+                    encodeProvider.encodeToInteger("NOR")};
+            Object result = provider.join(format, array);
+
+            long[] origins = provider.split(format, result);
+
+            for (int i = 0; i < origins.length; i++) {
+                Assert.assertEquals(origins[i], (long) array[i]);
+            }
 
             System.out.println(result);
         } catch (Exception e) {

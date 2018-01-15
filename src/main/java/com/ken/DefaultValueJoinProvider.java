@@ -23,12 +23,7 @@ public class DefaultValueJoinProvider implements ValueJoinProvider {
         if (format.getElementCount() != elementCount) {
             throw new ValueCountNotMatchException(elementCount, valueList.length);
         }
-        DefaultValueJoinFormat internalFormat;
-        if (format instanceof DefaultValueJoinFormat) {
-            internalFormat = (DefaultValueJoinFormat) format;
-        } else {
-            internalFormat = getInternalFormat(format);
-        }
+        DefaultValueJoinFormat internalFormat = getInternalFormat(format);
         long[] data = internalFormat.createDatas();
         for (int i = 0; i < elementCount; i++) {
             short value = valueList[i];
@@ -48,14 +43,7 @@ public class DefaultValueJoinProvider implements ValueJoinProvider {
         if (format.getElementCount() != valueList.length) {
             throw new ValueCountNotMatchException(elementCount, valueList.length);
         }
-
-        DefaultValueJoinFormat internalFormat;
-        if (format instanceof DefaultValueJoinFormat) {
-            internalFormat = (DefaultValueJoinFormat) format;
-        } else {
-            internalFormat = getInternalFormat(format);
-        }
-
+        DefaultValueJoinFormat internalFormat = getInternalFormat(format);
         long[] data = internalFormat.createDatas();
         for (int i = 0; i < elementCount; i++) {
             int value = valueList[i];
@@ -75,14 +63,7 @@ public class DefaultValueJoinProvider implements ValueJoinProvider {
         if (format.getElementCount() != valueList.length) {
             throw new ValueCountNotMatchException(elementCount, valueList.length);
         }
-
-        DefaultValueJoinFormat internalFormat;
-        if (format instanceof DefaultValueJoinFormat) {
-            internalFormat = (DefaultValueJoinFormat) format;
-        } else {
-            internalFormat = getInternalFormat(format);
-        }
-
+        DefaultValueJoinFormat internalFormat = getInternalFormat(format);
         long[] data = internalFormat.createDatas();
         for (int i = 0; i < elementCount; i++) {
             long value = valueList[i];
@@ -94,6 +75,28 @@ public class DefaultValueJoinProvider implements ValueJoinProvider {
         }
 
         return new VariableValue(data);
+    }
+
+    @Override
+    public long[] split(ValueJoinFormat format, Object obj) throws ValueJoinException {
+        if (!(obj instanceof VariableValue)) {
+            //TODO: 异常处理
+            return null;
+        }
+        DefaultValueJoinFormat internalFormat = getInternalFormat(format);
+
+        VariableValue value = (VariableValue) obj;
+        long[] datas = value.getData();
+        if (datas.length != internalFormat.getDataLength()) {
+            return null;
+        }
+
+        int elementCount = internalFormat.getElementCount();
+        long[] results = new long[elementCount];
+        for (int i = 0; i < elementCount; i++) {
+            results[i] = extractValue(datas, internalFormat.getElementInfo(i));
+        }
+        return results;
     }
 
     private void insertValue(long[] data, DefaultValueJoinFormat.ElementInfo info, long value) {
@@ -111,13 +114,33 @@ public class DefaultValueJoinProvider implements ValueJoinProvider {
         }
     }
 
-    private DefaultValueJoinFormat getInternalFormat(ValueJoinFormat format) {
-        if (formatMap.containsKey(format)) {
-            return formatMap.get(format);
+    private long extractValue(long[] data, DefaultValueJoinFormat.ElementInfo info) {
+        int index = info.getStartIndex();
+        int nextDigits = info.getNextDigits();
+        int curDigits = info.getCurDigits();
+        int offset = info.getOffset();
+        if (nextDigits == 0) {
+            return (data[index] >>> offset) & getMask(curDigits);
         } else {
-            DefaultValueJoinFormat internalFormat = new DefaultValueJoinFormat(format);
-            formatMap.put(format, internalFormat);
-            return internalFormat;
+            long a = (data[index] >>> offset);
+            long b = a & getMask(curDigits);
+            long val = ((data[index] >>> offset) & getMask(curDigits)) << nextDigits;
+            val += data[index++] & getMask(nextDigits);
+            return ((data[index] >>> offset) & getMask(curDigits)) + ((data[index++] & getMask(nextDigits)) << curDigits);
+        }
+    }
+
+    private DefaultValueJoinFormat getInternalFormat(ValueJoinFormat format) {
+        if (format instanceof DefaultValueJoinFormat) {
+            return  (DefaultValueJoinFormat) format;
+        } else {
+            if (formatMap.containsKey(format)) {
+                return formatMap.get(format);
+            } else {
+                DefaultValueJoinFormat internalFormat = new DefaultValueJoinFormat(format);
+                formatMap.put(format, internalFormat);
+                return internalFormat;
+            }
         }
     }
 

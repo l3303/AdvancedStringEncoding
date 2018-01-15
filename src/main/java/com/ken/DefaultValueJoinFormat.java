@@ -38,6 +38,10 @@ public class DefaultValueJoinFormat implements ValueJoinFormat {
         return digitList;
     }
 
+    public int getDataLength() {
+        return dataLength;
+    }
+
     public long[] createDatas() {
         return new long[dataLength];
     }
@@ -59,6 +63,8 @@ public class DefaultValueJoinFormat implements ValueJoinFormat {
             curVolume -= loadedDigits;
             digits -= loadedDigits;
 
+            elementInfos[i].setOffset(curVolume);
+
             if (curVolume == 0) {
                 startIndex++;
                 curVolume = MAX_VOLUME;
@@ -79,6 +85,7 @@ public class DefaultValueJoinFormat implements ValueJoinFormat {
         private final long valueLimitLong;
 
         private int startIndex;
+        private int offset;
         private int curDigits;
         private int nextDigits;
 
@@ -95,6 +102,14 @@ public class DefaultValueJoinFormat implements ValueJoinFormat {
 
         public void setStartIndex(int startIndex) {
             this.startIndex = startIndex;
+        }
+
+        public int getOffset() {
+            return offset;
+        }
+
+        public void setOffset(int offset) {
+            this.offset = offset;
         }
 
         public int getCurDigits() {

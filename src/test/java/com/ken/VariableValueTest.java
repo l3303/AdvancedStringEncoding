@@ -1,5 +1,6 @@
 package com.ken;
 
+import com.ken.utils.LongExtensions;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -9,20 +10,49 @@ public class VariableValueTest {
 
     @Test
     public void test() {
-        VariableValue test = new VariableValue(new long[]{348272719212L, 842619284L});
+        System.out.println(16 << 12);
 
-        System.out.println(test);
-        System.out.println(test.hashCode());
+//        VariableValue test = new VariableValue(new long[]{348272719212L, 842619284L});
+//
+//        System.out.println(test);
+//        System.out.println(test.hashCode());
+//
+//        HashMap<VariableValue, Integer> map = new HashMap<VariableValue, Integer>();
+//        map.put(test, 3);
+//
+//        Assert.assertEquals("5116abf56c32395994", test.toString());
+//        Assert.assertEquals(3, map.get(test).intValue());
+//
+//        test = new VariableValue(null);
+//
+//        System.out.println(test);
+//        System.out.println(test.hashCode());
 
-        HashMap<VariableValue, Integer> map = new HashMap<VariableValue, Integer>();
-        map.put(test, 3);
+        long a = 0x8000000000000000L + 1L;
+        System.out.println(Long.toBinaryString(a));
+        a -= 0x8000000000000000L;
+        System.out.println(Long.toBinaryString(a));
 
-        Assert.assertEquals("5116abf56c32395994", test.toString());
-        Assert.assertEquals(3, map.get(test).intValue());
+        System.out.println(Long.toBinaryString(LongExtensions.parseLongFromHexCharacters("8000000000000001".toCharArray(), 0)));
+//        System.out.println(0x8000000000000000L + 1L);
+//        System.out.println(Long.toBinaryString(0x8000000000000000L));
+//        System.out.println(Long.toHexString(0x8000000000000000L));
 
-        test = new VariableValue(null);
+//        VariableValue test = new VariableValue(null);
+//        System.out.println(test);
 
-        System.out.println(test);
-        System.out.println(test.hashCode());
+//        VariableValue test = new VariableValue(new long[]{1L,1L});
+//        System.out.println(test);
+    }
+
+    @Test
+    public void test1() {
+        VariableValue v1 = new VariableValue(new long[]{3L, 4L});
+        VariableValue v2 = new VariableValue(new long[]{5L, 6L});
+
+        String a = VariableValue.batchToHexString(v1, v2);
+        VariableValue[] vlist = VariableValue.batchParse(a);
+
+        Assert.assertEquals(2, vlist.length);
     }
 }

@@ -106,4 +106,88 @@ public class DefaultValueJoinProviderTest {
             e.printStackTrace();
         }
     }
+
+    @Test
+    public void test_routeSearchToken2() {
+        DefaultValueJoinFormat format1 = new DefaultValueJoinFormat(
+                CommonStringValueDigits.AIRLINE,
+                CommonStringValueDigits.FLIGHTNO,
+                CommonStringValueDigits.AIRLINE,
+                CommonStringValueDigits.FLIGHTNO,
+                CommonStringValueDigits.AIRLINE,
+                CommonStringValueDigits.FLIGHTNO,
+                CommonStringValueDigits.AIRLINE,
+                CommonStringValueDigits.FLIGHTNO,
+                CommonStringValueDigits.SEATGRADE,
+                6,
+                CommonStringValueDigits.SEATGRADE,
+                6,
+                CommonStringValueDigits.SEATGRADE,
+                6,
+                CommonStringValueDigits.SEATGRADE,
+                6
+        );
+
+        DefaultValueJoinFormat format2 = new DefaultValueJoinFormat(
+                CommonStringValueDigits.ENGINETYPE,
+                16,
+                12,
+                CommonStringValueDigits.AGENCY_ID,
+                CommonStringValueDigits.AIRLINE,
+                CommonStringValueDigits.ELIGIBILITY_CODE
+        );
+
+        DefaultValueJoinProvider provider = new DefaultValueJoinProvider();
+
+        DefaultEncodeProvider encodeProvider = new DefaultEncodeProvider();
+        try {
+
+            int[] array1 = new int[]{
+                    encodeProvider.encodeToInteger("MU"),
+                    501,
+                    encodeProvider.encodeToInteger("FM"),
+                    502,
+                    encodeProvider.encodeToInteger("CX"),
+                    503,
+                    encodeProvider.encodeToInteger("KE"),
+                    504,
+                    1,
+                    encodeProvider.encodeToInteger("Z"),
+                    1,
+                    encodeProvider.encodeToInteger("Z"),
+                    1,
+                    encodeProvider.encodeToInteger("Z"),
+                    1,
+                    encodeProvider.encodeToInteger("Z")};
+
+            int[] array2 = new int[]{
+                    16,
+                    1032,
+                    301,
+                    137,
+                    encodeProvider.encodeToInteger("MU"),
+                    encodeProvider.encodeToInteger("NOR")};
+
+            Object result1 = provider.join(format1, array1);
+            Object result2 = provider.join(format2, array2);
+
+            String a = VariableValue.batchToHexString((VariableValue)result1, (VariableValue)result2);
+            System.out.println(a);
+
+            VariableValue[] results = VariableValue.batchParse(a);
+
+            long[] origins1 = provider.split(format1, results[0]);
+            long[] origins2 = provider.split(format2, results[1]);
+
+            for (int i = 0; i < origins1.length; i++) {
+                Assert.assertEquals((long) array1[i], origins1[i]);
+            }
+
+            for (int i = 0; i < origins2.length; i++) {
+                Assert.assertEquals((long) array2[i], origins2[i]);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

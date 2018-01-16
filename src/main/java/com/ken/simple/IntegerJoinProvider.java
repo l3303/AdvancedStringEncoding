@@ -7,7 +7,7 @@ import com.ken.exception.ValueJoinOutOfRangeException;
 
 public class IntegerJoinProvider {
 
-    private static final int DIGITS_LIMIT = Integer.SIZE - 1;
+    private static final int DIGITS_LIMIT = Integer.SIZE;
 
     public static boolean validate(ValueJoinFormat format) {
         int totalDigits = 0;
@@ -40,7 +40,7 @@ public class IntegerJoinProvider {
         for (int i = digitList.length; i > 0; i--) {
             int digits = digitList[i - 1];
             list[i - 1] = value & ((1 << digits) - 1);
-            value >>= digits;
+            value >>>= digits;
         }
         return list;
     }

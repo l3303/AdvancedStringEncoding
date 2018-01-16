@@ -10,6 +10,10 @@ public class VariableValueTest {
 
     @Test
     public void test() {
+        System.out.println(Long.toBinaryString(0x8000000000000000L >>> 3));
+        System.out.println(Long.toBinaryString(0x8000000000000000L >> 3));
+
+
         System.out.println(16 << 12);
 
 //        VariableValue test = new VariableValue(new long[]{348272719212L, 842619284L});
@@ -29,9 +33,11 @@ public class VariableValueTest {
 //        System.out.println(test.hashCode());
 
         long a = 0x8000000000000000L + 1L;
-        System.out.println(Long.toBinaryString(a));
-        a -= 0x8000000000000000L;
-        System.out.println(Long.toBinaryString(a));
+//        System.out.println(Long.toBinaryString(a));
+//        a -= 0x8000000000000000L;
+//        System.out.println(Long.toBinaryString(a));
+
+
 
         System.out.println(Long.toBinaryString(LongExtensions.parseLongFromHexCharacters("8000000000000001".toCharArray(), 0)));
 //        System.out.println(0x8000000000000000L + 1L);

@@ -1,9 +1,6 @@
 package com.ken;
 
-import com.ken.exception.ValueCountNotMatchException;
-import com.ken.exception.ValueJoinException;
-import com.ken.exception.ValueJoinOutOfRangeException;
-import com.ken.exception.ValueSplitException;
+import com.ken.exception.*;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -81,14 +78,13 @@ public class DefaultValueJoinProvider implements ValueJoinProvider {
     @Override
     public long[] split(ValueJoinFormat format, Object obj) throws ValueSplitException {
         if (!(obj instanceof VariableValue)) {
-            //TODO: 异常处理
-            return null;
+            throw new ValueSplitNotSupportedException(obj);
         }
         VariableValue value = (VariableValue) obj;
         DefaultValueJoinFormat internalFormat = getInternalFormat(format);
         long[] data = value.getData();
         if (data.length != internalFormat.getDataLength()) {
-            return null;
+            throw new ValueSplitNotSupportedException(obj);
         }
 
         int elementCount = internalFormat.getElementCount();

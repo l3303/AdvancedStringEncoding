@@ -61,17 +61,16 @@ public final class VariableValue {
     public static VariableValue[] batchParse(String valStr) {
         int valLen = valStr.length();
         if (valLen % LongExtensions.HEX_STRING_LENGTH != 0) {
-            //TODO: 异常处理待定
-            return null;
+            throw new IllegalArgumentException(String.format("% is illegal!", valStr));
         }
 
-        char[] strVals = valStr.toCharArray();
+        char[] charList = valStr.toCharArray();
         int valCount =  valLen / LongExtensions.HEX_STRING_LENGTH;
         long[] valList = new long[valCount];
         int offset = 0;
         int resultCount = 0;
         for (int i = 0; i < valCount; i++) {
-            valList[i] = LongExtensions.parseLongFromHexCharacters(strVals, offset);
+            valList[i] = LongExtensions.parseLongFromHexCharacters(charList, offset);
             if (valList[i] < 0) {
                 resultCount++;
             }
@@ -91,7 +90,7 @@ public final class VariableValue {
                 resultList[resultIndex] = new VariableValue(data);
 
                 resultIndex++;
-                startIndex = i;
+                startIndex = i + 1;
                 len = 0;
             }
         }

@@ -17,9 +17,13 @@ public class DefaultValueJoinProvider implements ValueJoinProvider {
 
     @Override
     public Object join(ValueJoinFormat format, short... valueList) throws ValueJoinException {
+        if (format == null || valueList ==null || valueList.length == 0) {
+            return null;
+        }
         int elementCount = valueList.length;
-        if (format.getElementCount() != elementCount) {
-            throw new ValueCountNotMatchException(elementCount, valueList.length);
+        int count = format.getElementCount();
+        if (count != elementCount) {
+            throw new ValueCountNotMatchException(count, elementCount);
         }
         DefaultValueJoinFormat internalFormat = getInternalFormat(format);
         long[] data = internalFormat.createDatas();
@@ -37,9 +41,13 @@ public class DefaultValueJoinProvider implements ValueJoinProvider {
 
     @Override
     public Object join(ValueJoinFormat format, int... valueList) throws ValueJoinException {
+        if (format == null || valueList ==null || valueList.length == 0) {
+            return null;
+        }
         int elementCount = valueList.length;
-        if (format.getElementCount() != valueList.length) {
-            throw new ValueCountNotMatchException(elementCount, valueList.length);
+        int count = format.getElementCount();
+        if (count != elementCount) {
+            throw new ValueCountNotMatchException(count, elementCount);
         }
         DefaultValueJoinFormat internalFormat = getInternalFormat(format);
         long[] data = internalFormat.createDatas();
@@ -57,9 +65,13 @@ public class DefaultValueJoinProvider implements ValueJoinProvider {
 
     @Override
     public Object join(ValueJoinFormat format, long... valueList) throws ValueJoinException {
+        if (format == null || valueList ==null || valueList.length == 0) {
+            return null;
+        }
         int elementCount = valueList.length;
-        if (format.getElementCount() != valueList.length) {
-            throw new ValueCountNotMatchException(elementCount, valueList.length);
+        int count = format.getElementCount();
+        if (count != elementCount) {
+            throw new ValueCountNotMatchException(count, elementCount);
         }
         DefaultValueJoinFormat internalFormat = getInternalFormat(format);
         long[] data = internalFormat.createDatas();
@@ -77,6 +89,9 @@ public class DefaultValueJoinProvider implements ValueJoinProvider {
 
     @Override
     public long[] split(ValueJoinFormat format, Object obj) throws ValueSplitException {
+        if (format == null || obj == null) {
+            return null;
+        }
         if (!(obj instanceof VariableValue)) {
             throw new ValueSplitNotSupportedException(obj);
         }

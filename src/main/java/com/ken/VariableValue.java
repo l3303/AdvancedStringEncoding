@@ -61,7 +61,7 @@ public final class VariableValue {
     public static VariableValue[] batchParse(String valStr) {
         int valLen = valStr.length();
         if (valLen % LongExtensions.HEX_STRING_LENGTH != 0) {
-            throw new IllegalArgumentException(String.format("% is illegal!", valStr));
+            throw new IllegalArgumentException(String.format("%s is illegal!", valStr));
         }
 
         char[] charList = valStr.toCharArray();

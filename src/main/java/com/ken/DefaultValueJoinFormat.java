@@ -9,6 +9,7 @@ import java.util.List;
 public class DefaultValueJoinFormat implements ValueJoinFormat {
 
     private static final int MAX_VOLUME = Long.SIZE - 1;
+    private static final int[] EMPTY = new int[0];
 
     private final int elementCount;
     private final int[] digitList;
@@ -17,13 +18,14 @@ public class DefaultValueJoinFormat implements ValueJoinFormat {
     private int dataLength;
 
     public DefaultValueJoinFormat(int... digitList) {
-        this.digitList = digitList;
-        elementCount = digitList.length;
+        this.digitList = digitList != null ? digitList : EMPTY;
+        elementCount = this.digitList.length;
         initial();
     }
 
     public DefaultValueJoinFormat(ValueJoinFormat format) {
-        this.digitList = format.encodeDigitList();
+        int[] inputDigits = format.encodeDigitList();
+        this.digitList = inputDigits != null ? inputDigits : EMPTY;
         elementCount = this.digitList.length;
         initial();
     }
@@ -51,6 +53,12 @@ public class DefaultValueJoinFormat implements ValueJoinFormat {
     }
 
     private void initial() {
+        if (elementCount == 0) {
+            elementInfos = new DefaultValueJoinFormat.ElementInfo[0];
+            dataLength = 0;
+            return;
+        }
+
         elementInfos = new DefaultValueJoinFormat.ElementInfo[elementCount];
         int dataIndex = 0;
         int curVolume = MAX_VOLUME;

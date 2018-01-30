@@ -10,6 +10,9 @@ public class ShortJoinProvider {
     private static final int DIGITS_LIMIT = Short.SIZE;
 
     public static boolean validate(ValueJoinFormat format) {
+        if (format == null) {
+            return false;
+        }
         int totalDigits = 0;
         for (int digits : format.encodeDigitList()) {
             totalDigits += digits;
@@ -21,6 +24,9 @@ public class ShortJoinProvider {
     }
 
     public static short join (ValueJoinFormat format, short... valueList) throws ValueJoinException {
+        if (format == null || valueList ==null || valueList.length == 0) {
+            return 0;
+        }
         int elementCount = valueList.length;
         if (format.getElementCount() != elementCount) {
             throw new ValueCountNotMatchException(format.getElementCount(), valueList.length);
@@ -35,6 +41,9 @@ public class ShortJoinProvider {
     }
 
     public static short[] split(ValueJoinFormat format, short value) {
+        if (format == null) {
+            return null;
+        }
         int intVal = (int) value;
         int[] digitList = format.encodeDigitList();
         short[] list = new short[digitList.length];
@@ -46,13 +55,17 @@ public class ShortJoinProvider {
         return list;
     }
 
-    private static short join(short origin, int digits, short value) {
+    private static short join(short origin, int digits, short value) throws ValueJoinOutOfRangeException {
+        short limit = (short) ((1 << digits) - 1);
+        if (value > limit) {
+            throw new ValueJoinOutOfRangeException(limit, value);
+        }
         origin <<= digits;
         origin += value;
         return origin;
     }
 
-    public class Builder {
+    public static class Builder {
         private short result = 0;
         private int usedDigits = 0;
 
@@ -60,10 +73,6 @@ public class ShortJoinProvider {
             usedDigits += digits;
             if (usedDigits > DIGITS_LIMIT) {
                 throw new ValueJoinOutOfRangeException(DIGITS_LIMIT, usedDigits);
-            }
-            short limit = (short) (1 << digits - 1);
-            if (value > limit) {
-                throw new ValueJoinOutOfRangeException(limit, value);
             }
             result = join(result, digits, value);
             return result;
